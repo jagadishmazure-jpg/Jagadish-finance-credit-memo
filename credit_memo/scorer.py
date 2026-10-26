@@ -9,6 +9,8 @@ This is a transparent rule-based scorer, not a trained model. It is a
 teaching and demonstration artifact, not a lending decision engine.
 """
 
+from credit_memo.models import RiskResult
+
 BASE_SCORE = 300
 
 BANDS = (
@@ -95,9 +97,7 @@ def band_for_score(score: int) -> str:
     raise AssertionError("unreachable: lowest band threshold is 0")
 
 
-def score_application(app) -> "RiskResult":
-    from credit_memo.models import RiskResult
-
+def score_application(app) -> RiskResult:
     contributions = {name: fn(app) for name, fn in FEATURES}
     score = BASE_SCORE + sum(contributions.values())
     return RiskResult(

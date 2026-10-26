@@ -111,6 +111,16 @@ def test_email_refused_in_ci_even_with_opt_in(monkeypatch):
         channel.send("a@example.invalid", "Memo", "body", opt_in=True)
 
 
+def test_email_dry_run_records_even_in_ci(monkeypatch):
+    # Regression: the runner sets CI, and a dry run must still return
+    # its record instead of raising, because it transmits nothing.
+    monkeypatch.setenv("CI", "true")
+    channel = EmailChannel()
+    record = channel.send("a@example.invalid", "Memo", "body")
+    assert record["status"] == "dry_run"
+    assert record["transmitted"] is False
+
+
 def test_email_channel_has_no_credential_attributes():
     channel = EmailChannel()
     for attr in ("password", "api_key", "smtp_password", "token", "secret"):
